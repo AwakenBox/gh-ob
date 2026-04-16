@@ -1,4 +1,4 @@
 interface:
   display_name: "GitHub 仓库归档"
-  short_description: "分类 GitHub 仓库并写入 Obsidian 使用笔记"
-  default_prompt: "使用 $gh-ob 克隆或下载 GitHub 仓库，总结安装和使用方式，完成分类，并把笔记保存到我的 Obsidian 知识库。"
+  short_description: "快速同步 GitHub 源码并把结论写进 Obsidian 归档笔记"
+  default_prompt: "使用 $gh-ob 快速同步 GitHub 仓库源码到 D:\\Obsidian\\Github\\Source-Repos，优先走 git，同步失败时自动回退到 GitHub API 源码快照，然后总结安装和使用方式、完成分类，并把笔记保存到我的 Obsidian 知识库。"

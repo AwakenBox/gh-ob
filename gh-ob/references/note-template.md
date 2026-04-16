@@ -8,7 +8,7 @@ tags:
   - github
   - repo-note
   - ai
-本地仓库路径: "C:\\Users\\wobes\\GitHub-Cache\\ai\\agents\\owner__repo"
+本地仓库路径: "D:\\Obsidian\\Github\\Source-Repos\\owner__repo"
 状态: "已整理"
 最后整理日期: "YYYY-MM-DD"
 ---
@@ -61,6 +61,7 @@ tags:
 
 ## 我需要记住的点
 
+- 本地副本类型：
 - 环境要求：
 - 潜在坑点：
 - 文档是否完整：

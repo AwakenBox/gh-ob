@@ -85,4 +85,5 @@ GitHub-Knowledge/
 
 - 笔记文件名：`owner__repo.md`
 - 本地仓库目录名：`owner__repo`
+- 默认本地源码根目录：`D:\Obsidian\Github\Source-Repos`
 - 优先使用稳定路径，这样后续更新时可以覆盖已有笔记，而不会产生重复文件。

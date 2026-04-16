@@ -1,6 +1,6 @@
 ---
 name: gh-ob
-description: 克隆或下载 GitHub 仓库，阅读 README 和关键项目文件，按 AI 优先的分类体系归档，总结安装与使用方式，并将结构化 Markdown 笔记保存到 `D:\Obsidian\Github`。当 Codex 收到一个或多个 GitHub 仓库链接，且目标是归档项目知识、建立个人仓库资料库、比较工具或将仓库文档沉淀为可复用的 Obsidian 笔记时使用此技能。
+description: 克隆或下载 GitHub 仓库，将源码优先同步到 `D:\Obsidian\Github\Source-Repos`，阅读 README 和关键项目文件，按 AI 优先的分类体系归档，总结安装与使用方式，并将结构化 Markdown 笔记保存到 `D:\Obsidian\Github`。当 Codex 收到一个或多个 GitHub 仓库链接，且目标是归档项目知识、建立个人仓库资料库、比较工具或将仓库文档沉淀为可复用的 Obsidian 笔记时使用此技能。
 ---
 
 # GitHub 仓库归档到 Obsidian
@@ -14,10 +14,11 @@ description: 克隆或下载 GitHub 仓库，阅读 README 和关键项目文件
 
 - Obsidian 仓库根目录：`D:\Obsidian\Github`
 - 知识库根目录：`D:\Obsidian\Github\GitHub-Knowledge`
-- 默认本地仓库缓存目录：`C:\Users\wobes\GitHub-Cache`
+- 默认本地源码目录：`D:\Obsidian\Github\Source-Repos`
 - 笔记文件命名格式：`owner__repo.md`
 
 如果知识库根目录或目标分类目录还不存在，只创建当前笔记所需的目录以及 `00-Dashboard`。
+如果源码目录不存在，就创建 `D:\Obsidian\Github\Source-Repos` 以及当前仓库所需的子目录。
 
 ## 工作流程
 
@@ -29,9 +30,15 @@ description: 克隆或下载 GitHub 仓库，阅读 README 和关键项目文件
 
 ### 2. 安全获取源码
 
-- 默认优先使用 `git clone` 克隆到默认缓存目录或用户显式指定的缓存目录。
-- 如果仓库已经存在于本地，优先 `git fetch` 或直接读取现有仓库。
-- 只有在无法使用 `git`、仓库不可克隆，或用户明确要求非 git 下载方式时，才使用压缩包下载。
+- 默认优先将源码同步到 `D:\Obsidian\Github\Source-Repos\owner__repo`。
+- 始终优先运行 `scripts/fetch_github_repo.py <repo-url> --target-root "D:\Obsidian\Github\Source-Repos" --repair-broken --json`，不要手写临时的 clone / curl / 解压流程，除非脚本本身坏了。
+- 脚本的同步顺序是：
+  1. 已有 git 仓库：执行 `fetch --all --tags --prune`，可快进时再 `pull --ff-only`
+  2. 有 `gh` 且已登录：优先 `gh repo clone`，并传递浅克隆参数
+  3. 有 `git`：回退到原生 `git clone --depth=1 --filter=blob:none`
+  4. 前面都失败：回退到 GitHub API `zipball` 下载并解压为源码快照
+- 如果目标目录里只有残缺的 `.git` 元数据、存在锁文件，或明显是一次中断的 clone，优先使用 `--repair-broken` 让脚本把坏目录改名备份后再重试。
+- 只有在脚本明确失败且用户要求保留手工路径时，才使用脚本外的下载方式。
 - 不要自动执行来历不明的安装脚本。
 
 ### 3. 检查项目内容
@@ -70,6 +77,10 @@ description: 克隆或下载 GitHub 仓库，阅读 README 和关键项目文件
 - 除非用户明确要求其他语言，否则使用中文撰写总结。
 - 命令、文件名和路径统一使用等宽格式。
 - 笔记中要包含 GitHub 链接、本地仓库路径、分类、安装步骤、使用命令、重要文件和简短的实用评价。
+- “本地仓库路径” 默认写成 `D:\Obsidian\Github\Source-Repos\owner__repo`。
+- 脚本返回 JSON 时，优先读取其中的 `status`、`sync_method`、`local_copy_type`、`archive_path`、`revision` 和 `attempts`。
+- 如果 `local_copy_type` 是 `git-repo`，可以写成“本地已同步 git 仓库”；如果是 `source-snapshot`，必须明确写成“源码快照/zip 解压副本”，不要让人误以为本地带有 `.git` 历史。
+- 如果此次未能成功同步源码，要明确写出原因、失败方法和当前目录状态，不要假装已经下载完成。
 
 ### 7. 维护轻量索引
 
@@ -97,6 +108,8 @@ description: 克隆或下载 GitHub 仓库，阅读 README 和关键项目文件
 - 优先写高信息密度的简洁总结，不要机械复制 README 内容。
 - 要明确指出缺失的前置条件、过时文档或可疑的安装步骤。
 - 如果仓库内容不完整或文档质量较差，要明确保留不确定性。
+- 如果源码同步失败，要在最终说明和 Obsidian 笔记里同时注明失败原因、已尝试的方法，以及当前是否存在半截仓库目录。
+- 如果同步脚本成功返回 `source-snapshot`，要把它视为“可读源码已同步”而不是“git clone 成功”。
 
 ## 示例请求
 
